@@ -15,25 +15,27 @@ There are other solutions that allow you to remote control a PC, including video
 
 Instead, this project assumes that you have remote hands, but also assumes that those hands have their hands full with connecting the remote keyboard hardware, and using some smartphone based video chat software for transmitting the screen contents to you.
 
-You can even set up the USB stick (configuring network parameters is all that's necessary) and then mail in a small envelope.
+You can even set up the USB stick (configuring network parameters is all that's necessary) and mail it in a small envelope.
 
 Once plugged into the PC, the stick will...
 1. connect to Wifi
 2. TCP connect to an IP of your choice that runs the keyboard events emitter software
-3. send events received as USB HID keyboard events to the PC it is connected to physically.
+3. forward keyboard events received from the remote to the local PC as USB HID keyboard events.
 
-You can even control the UEFI/BIOS this way.²
+You can even remote control the UEFI/BIOS this way.²
 
 No VPN needed, no bulky KVM solution needed, total cost <10€.
 
 ## Hardware
 
-This thing uses RP2040 hardware combined with an ESP running the ESP-AT firmware connected to the UART lines of the RP2040.
-You can get this hardware prebuild as a Raspberry Pi Pico lookalike, branded as "Pico W-2023" (which is slightly misleading as the real Pico W uses the CYW43 chip for wifi connectivity).
-Note that the Pico W-2023 often ships with the ESP-AT firmware not yet flashed onto the ESP.
-You have to flash `Serial_port_transmission.uf2` onto the RP2040 then reset with the ESP boot button pressed then flash the ESP with a 1MBit ESP-AT firmware.
+Install this on a "Pico W-2023" Raspberry Pi Pico clone.
+That hardware uses an RP2040 microcontroller combined with an ESP8285 running the ESP-AT firmware connected to the UART lines of the RP2040.
 
-It should be simple to port this to the real Pico W as well.
+The Pico W-2023 often ships with the ESP-AT firmware not yet installed on the ESP.
+In that case, flash `Serial_port_transmission.uf2` onto the RP2040 then reset with the ESP boot button pressed then flash the ESP with a 1MBit ESP-AT firmware.
+
+It should be simple to port this to the real RP Pico W (that is using a CYW43 instead of an ESP for Wifi connectivity) as well.
+Porting to the ESP32-S line (that offers USB OTG) should also be possible, but MicroPython USB HID does not seem to support that yet.
 
 ## Installation and Usage
 
@@ -51,6 +53,7 @@ The red button will send Magic SysRq to reboot.
 
 The event server software must be reachable for TCP inbound connections originating from the stick.
 As an easy solution, you can configure the stick to connect to some host you control that has a public IP, then connect to that from the machine running the event server using `ssh -R 0.0.0.0:PORT:127.0.0.1:PORT publichost` or similar.
+sshd needs to have `GatewayPorts yes` set to allow binding other interfaces than localhost.
 
 ## Troubleshooting
 
